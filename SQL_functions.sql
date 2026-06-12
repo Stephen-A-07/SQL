@@ -111,7 +111,14 @@ SELECT CAST('123' AS INT);
 SELECT '123' :: INT;
 
 
+--null functions
 
+--COALESCE
+SELECT COALESCE(firstname,' ') FROM customers;
+
+--is null & not null
+SELECT firstnam FROM customers WHERE firstnam IS NOT null;
+SELECT orderdate FROM orders WHERE firstnam IS  null;
 
 
 
