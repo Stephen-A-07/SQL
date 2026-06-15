@@ -116,21 +116,70 @@ SELECT '123' :: INT;
 --COALESCE
 SELECT COALESCE(firstname,' ') FROM customers;
 
---is null & not null
-SELECT firstnam FROM customers WHERE firstnam IS NOT null;
-SELECT orderdate FROM orders WHERE firstnam IS  null;
+--is null & is not null
+SELECT firstname FROM customers WHERE firstname IS NOT null;
+SELECT orderdate FROM orders WHERE orderdate IS  null;
+
+--handle null before sorting
+SELECT customerid,
+	score
+	FROM customers 
+ORDER BY CASE WHEN score IS NULL THEN 1 ELSE 0 END,score;
+
+--nullif()
+--returns null if the comparison is true then null else return the first value
+SELECT orderid,
+	sales,
+	quantity,
+	(sales/NULLIF(quantity,0)) AS price 
+FROM orders;
+
+SELECT * FROM customers WHERE score IS NULL;
+SELECT * FROM customers WHERE score IS NOT NULL;
 
 
+SELECT c.*,o.orderid FROM customers c
+LEFT JOIN orders o ON c.customerid = o.customerid
+WHERE o.orderid IS NULL; 
+
+--CASE STATEMENTS
+
+SELECT sales, CASE 
+	WHEN sales > 50 THEN 'High'
+	WHEN sales > 20 THEN 'Medium'
+	ELSE 'Low'
+	END 
+FROM orders;
 
 
+SELECT 
+category,SUM(sales) AS totalsales
+FROM
+(
+SELECT sales, CASE 
+	WHEN sales > 50 THEN 'High'
+	WHEN sales > 20 THEN 'Medium'
+	ELSE 'Low'
+	END category
+FROM orders
+)
+GROUP BY category
+ORDER BY totalsales DESC;
 
+--AGGREGATE FUNCTIONS
+-- COUNT(*) - total number of rows.
+-- SUM()- total sales
+-- AVG()- average sales
+-- MAX()- highes value
+-- MIN()- minimum value
 
-
-
-
-
-
-
+SELECT 
+	COUNT(*) Totalnocustomers,
+	SUM(sales) Total_sales,
+	AVG(sales) Avg_sales,
+	MAX(sales) highest_sale,
+	MIN(sales) lowest_sale
+FROM orders;
 
 
 
