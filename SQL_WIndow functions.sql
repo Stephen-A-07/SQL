@@ -87,25 +87,119 @@ SELECT
 FROM orders;
 
 
+SELECT 
+	orderid,
+	orderdate,
+	customerid,
+	COUNT(*) OVER(),
+	sales,
+	COUNT(sales) over()
+FROM orders;
+
+--to find duplicate
+SELECT 
+	orderid,
+	COUNT(*) OVER(PARTITION BY orderid) Checkpk
+FROM orders;
+
+SELECT 
+* FROM (
+	SELECT 
+		orderid,
+		COUNT(*) OVER(PARTITION BY orderid) DuplicateCount
+	FROM ordersarchive
+)t WHERE DuplicateCount > 1;
+
+--------------------------------------------------------------
+
+--SUM()
+
+SELECT 
+	orderid,
+	orderdate,
+	SUM(sales) OVER() salesforallprod,
+	SUM(sales) OVER(PARTITION BY productid ) salesforeachpro
+FROM orders;
+
+SELECT 
+	overallsum,
+	eachproductsum,
+	(eachproductsum * 100 / overallsum) percentageprice
+FROM (
+	SELECT 
+		sales,
+		productid,
+		SUM(sales) OVER() overallsum,
+		SUM(sales) OVER(PARTITION BY productid) eachproductsum
+	FROM orders
+)t;
+
+SELECT 
+	orderid,
+	productid,
+	sales,
+	SUM(sales) OVER() totalsales,
+	ROUND (CAST(sales AS NUMERIC)/SUM(sales) OVER() *100,2) percentagetotal
+FROM orders;
+
+
+--------------------------------------------------------------------------
+
+--AVG()
+
+SELECT 
+	orderid,
+	orderdate,
+	ROUND(AVG(sales) OVER()) salesavg,
+	ROUND(AVG(sales) OVER(PARTITION BY productid)) avgsalesbyproduct
+FROM orders;
+
+
+SELECT 
+	customerid,
+	lastname,
+	score,
+	ROUND(AVG(COALESCE(score,0)) OVER(),2) avgscore
+FROM customers;
 
 
 
+SELECT *
+FROM (
+	SELECT 
+		orderid,
+		sales,
+		AVG(sales) OVER() avgsales
+	FROM orders
+)t WHERE sales > avgsales;
+
+------------------------------------------------------------
+
+--MIN and MAX 
+
+SELECT 
+	orderid,
+	orderdate,
+	sales,
+	MIN(sales) OVER() lowestsale,
+	MAX(sales) OVER() Maxsale,
+	MIN(sales) OVER(PARTITION BY productid) lowsalesechproduct,
+	MAX(sales) OVER(PARTITION BY productid) Maxsaleseachproduct	
+FROM orders;
 
 
+SELECT
+* FROM(
+	SELECT 
+		employeeid,
+		firstname,
+		salary,
+		MAX(salary) OVER() maxsalary
+	FROM employees
+)t WHERE salary = maxsalary;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+--RUNNIG TOTAL AND ROLLING TOTAL
 
 
 
