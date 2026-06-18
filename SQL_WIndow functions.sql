@@ -201,6 +201,138 @@ SELECT
 
 --RUNNIG TOTAL AND ROLLING TOTAL
 
+SELECT 
+	sales,
+	productid,
+	AVG(sales) OVER(PARTITION BY productid ORDER BY orderdate) movingavgsales
+FROM orders;
+
+--rolling order
+
+SELECT 
+	sales,
+	productid,
+	AVG(sales) OVER(PARTITION BY productid ORDER BY orderdate ROWS BETWEEN CURRENT ROW AND 1 FOLLOWING) rollingavgsales
+FROM orders;
+
+-------------------------------------------------------------------------------------------
+
+--WINDOW ANKING FUNCTIONS
+
+--rank fuction does not take any value and order by is must
+--except ntile
+--we cannot create frames
+
+--ROW_NUMBER
+--if there are duplicates then it does not handle it the distinct ranks are given
+SELECT 
+	sales,
+	ROW_NUMBER() OVER(ORDER BY sales DESC)
+FROM orders;
+
+--RANK()
+--handles the duplicate,it skips rank
+
+
+SELECT 
+	sales,
+	RANK() OVER(ORDER BY sales DESC)
+FROM orders;
+
+--DEENSE_RANK
+--handles duplicate and does not skip ranks
+
+SELECT 
+	sales,
+	DENSE_RANK() OVER(ORDER BY sales DESC)
+FROM orders;
+
+SELECT 
+* FROM (
+SELECT 
+	productid,
+	sales,
+	ROW_NUMBER() OVER(PARTITION BY productid ORDER BY sales DESC) salesrank
+FROM orders
+)t WHERE salesrank = 1;
+
+SELECT 
+	* 
+FROM(
+	SELECT 
+		customerid,
+		SUM(sales) totalsales,
+		ROW_NUMBER() OVER(ORDER BY SUM(sales)) rowrank
+	FROM orders GROUP BY customerid
+)t WHERE rowrank <= 2;
+
+
+SELECT 
+	ROW_NUMBER() OVER(ORDER BY orderid) uniqueid,
+	* 
+FROM ordersarchive;
+
+--removing duplicates
+SELECT 
+* FROM(
+	SELECT 
+		orderid,
+		ROW_NUMBER() OVER (PARTITION BY orderid ORDER BY creationtime DESC) rn
+	FROM ordersarchive
+)t WHERE rn = 1;
+
+--ntile(value)
+-- bucket size = total rows/ bucket size
+--10/2=5
+SELECT 
+	orderid,
+	sales,
+	NTILE(1) OVER (ORDER BY sales DESC) onebucket,
+	NTILE(2) OVER (ORDER BY sales DESC) twobucket,
+	NTILE(3) OVER (ORDER BY sales DESC) threebucket,
+	NTILE(4) OVER (ORDER BY sales DESC) fourbucket
+FROM orders;
+
+
+SELECT 
+	orderid,
+	sales,
+	CASE 
+		WHEN Buckets = 1 THEN 'HIGH'
+		WHEN Buckets = 2 THEN 'MEDIUM'
+		ELSE 'LOW'
+	END categories
+
+FROM(
+	SELECT
+		*,
+		NTILE(3) OVER(ORDER BY sales) Buckets 
+	FROM orders
+)t;
+
+
+--PERCENTAGE BASED RAMKING
+
+--CUME_DIST
+-- cume_dist = position no/no of rows
+--if dup last occurence position value for all occcurence also
+
+
+--percent_rank
+--PERCENT_RANK = position no -1/ no of rows -1
+--if dup first occurece value position value for all even for the next occurence
+
+SELECT 
+	*
+FROM(
+	SELECT 
+		product,
+		price,
+		CUME_DIST() OVER(ORDER BY price) * 100 percentage
+	FROM products
+)t WHERE percentage <= 40;
+
+
 
 
 
