@@ -41,7 +41,7 @@ SELECT
 FROM orders;
 
 
---partition is used to divide a cols into different windows 
+--partition is used to divide a rows into different windows 
 --frame is use to get rows inside the windows
 --used only with order by
 
@@ -217,7 +217,7 @@ FROM orders;
 
 -------------------------------------------------------------------------------------------
 
---WINDOW ANKING FUNCTIONS
+--WINDOW RANKING FUNCTIONS
 
 --rank fuction does not take any value and order by is must
 --except ntile
@@ -239,7 +239,7 @@ SELECT
 	RANK() OVER(ORDER BY sales DESC)
 FROM orders;
 
---DEENSE_RANK
+--DENSE_RANK
 --handles duplicate and does not skip ranks
 
 SELECT 
@@ -331,6 +331,57 @@ FROM(
 		CUME_DIST() OVER(ORDER BY price) * 100 percentage
 	FROM products
 )t WHERE percentage <= 40;
+
+-------------------------------------------------------------------------
+--WINDOW VALUE FUNCTIONS
+
+--LAG() - access a value of the previous row
+--LEAD() - access a value of the next row
+
+-- LEAD{col,offset[no of rows to skip],default value if no rows are found} OVER(ORDER BY)
+
+
+--time data analysis
+SELECT 
+	*,
+	LAG(monthlysales) OVER (ORDER BY months),
+	ROUND((monthlysales - LAG(monthlysales) OVER (ORDER BY months))::numeric / LAG(monthlysales) OVER (ORDER BY months) *100,2)  mom_percentagechange
+FROM
+(SELECT 
+	DATE_TRUNC('month',orderdate) months,
+	SUM(sales) monthlysales
+FROM orders 
+GROUP BY 1
+)t;
+
+SELECT
+customerid,
+AVG(daysuntilnextorder) avgdays,
+RANK() OVER (ORDER BY AVG(daysuntilnextorder)) RANKING
+FROM (
+SELECT
+	orderid,
+	customerid,
+	orderdate currentorder,
+	LEAD(orderdate) OVER(PARTITION BY customerid ORDER BY orderdate) nextorder,
+	LEAD(orderdate) OVER(PARTITION BY customerid ORDER BY orderdate) -  orderdate daysuntilnextorder
+FROM orders
+)
+GROUP BY customerid;
+
+
+SELECT
+	productid,
+	sales,
+	FIRST_VALUE(sales) OVER (PARTITION BY productid ORDER BY sales) minvalue,
+	LAST_VALUE(sales) OVER (PARTITION BY productid ORDER BY sales ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING) maxvalue
+FROM orders;
+
+--------------------END OF WINDOW FUNCTIONS---------------------------------------
+
+
+
+
 
 
 
