@@ -47,8 +47,8 @@ FROM orders;
 
 
 -- here first the partition is done it is divided into 2 
--- delivered and shipped and we order it by date and then sum the values
--- based on the condition of the fram clause of one window at a time
+-- delivered and shipped we order it by date and then sum the values
+-- based on the condition of the frame clause of one window at a time
 SELECT 
 	orderid,
 	orderdate,

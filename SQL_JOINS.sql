@@ -19,6 +19,7 @@ ON c.customerid = o.customerid;
 
 --LEFT JOIN
 
+--LEFT join = inner join + all the rows from the left table which are present in the right table 
 SELECT c.firstname,c.customerid,o.orderid
 	FROM customers c 
 	LEFT JOIN orders o 
@@ -31,6 +32,11 @@ SELECT c.firstname,c.customerid,o.orderid
 ON c.customerid = o.customerid; 
 
 --FULL JOIN 
+-- A FULL OUTER JOIN returns:
+
+-- Matching rows from both tables
+-- Unmatched rows from the left table
+-- Unmatched rows from the right table
 
 SELECT c.firstname,c.customerid,o.orderid
 	FROM customers c 
@@ -38,7 +44,7 @@ SELECT c.firstname,c.customerid,o.orderid
 ON c.customerid = o.customerid;
 
 --LEFT ANTI JOIN
-
+--A LEFT ANTI JOIN returns rows from the left table that do not have a matching row in the right table.
 SELECT c.customerid,c.firstname,o.orderid,o.sales
 	FROM customers c
 	LEFT JOIN orders o
