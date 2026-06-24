@@ -47,7 +47,77 @@ SELECT *
 FROM customers c
 LEFT JOIN(
 SELECT customerid,COUNT(*)  FROM orders GROUP BY customerid
-) o ON c.customerid = o.customerid
+) o ON c.customerid = o.customerid;
+
+--COMPARISION OPERATORS
+
+--WHERE CLAUSE(Scalar)
+
+SELECT 
+	productid,
+	price 
+FROM products 
+WHERE (SELECT AVG(price) FROM products) < price;
+
+--IN and NOT IN OPERATOR
+--filtering in a list
+
+SELECT * 
+FROM orders 
+WHERE customerid IN (
+	SELECT customerid
+	FROM customers 
+	WHERE country = 'Germany'
+);
+
+SELECT * 
+FROM orders 
+WHERE customerid NOT IN (
+	SELECT customerid
+	FROM customers 
+	WHERE country = 'Germany'
+);
+
+
+--ANY and ALL OPERATOR
+
+SELECT 
+	employeeid,
+	firstname,
+	salary
+FROM employees 
+WHERE gender = 'F' AND salary > ANY (SELECT salary FROM employees WHERE gender = 'M');
+
+--ALL means it checks all the subquery row
+
+SELECT 
+	employeeid,
+	firstname,
+	salary
+FROM employees 
+WHERE gender = 'F' AND salary > ALL (SELECT salary FROM employees WHERE gender = 'M');
+
+
+-- SELECT o.customerid,COUNT(*) FROM orders o
+-- LEFT JOIN customers c ON o.customerid =  c.customerid
+-- GROUP BY o.customerid
+
+--corelated subqyery
+--the subquery is dependent on the main query
+SELECT 
+*, 
+(SELECT COUNT(*) FROM orders o WHERE o.customerid = c.customerid)
+FROM customers c;
+
+--EXISTS
+-- checks if the subquer returns any rows
+
+
+
+
+
+
+
 
 
 
