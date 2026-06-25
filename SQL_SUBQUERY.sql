@@ -112,7 +112,10 @@ FROM customers c;
 --EXISTS
 -- checks if the subquer returns any rows
 
-
+SELECT * 
+FROM orders o
+	WHERE EXISTS 
+(SELECT 1 FROM customers c WHERE country = 'Germany' AND o.customerid = c.customerid);
 
 
 
